@@ -188,7 +188,7 @@ void dispose() {
 }
 ```
 
-- It's body has a `Column` and column has one `TextFormField` and two `ElevatedButton`s to show or
+- It's body has a `Column` and column has one `TextField` and two `ElevatedButton`s to show or
   hide the keyboard using `focus` and `unfocus`.
 
 ```dart 
