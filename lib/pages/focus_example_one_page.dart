@@ -37,8 +37,8 @@ class _FocusExampleOnePageState extends State<FocusExampleOnePage> {
                     hintText: 'Field 1',
                     border: OutlineInputBorder(),
                   ),
-                  onFieldSubmitted: (value) {
-                    // pass focus to the next TextFormField when the button is tapped
+                  onFieldSubmitted: (_) {
+                    // pass focus to the next TextFormField when submit button is tapped on keyboard
                     FocusScope.of(context).requestFocus(field2FocusNode);
                     // field2FocusNode.requestFocus(); // This works same as above
                   },
@@ -51,7 +51,7 @@ class _FocusExampleOnePageState extends State<FocusExampleOnePage> {
                     hintText: 'Field 2',
                     border: OutlineInputBorder(),
                   ),
-                  onFieldSubmitted: (value) => FocusScope.of(context).unfocus(),
+                  onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
                   textInputAction: TextInputAction.done,
                 ),
               ],

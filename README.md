@@ -106,12 +106,165 @@
 **The Structured Main Content**
 
 1. In this project, there are three examples shown for Focus widget of flutter.
-2. `focus_example_one_page.dart` shows how to focus to next fields and unfocus on the last field.
-   <br/> It shows how to shift focus to the next TextField or TextFormField in Flutter | focus,
-   unfocus, requestFocus
-3. `focus_example_two_page.dart` shows how to hide/show keyboard | TextField Focus/Unfocus
+2. `focus_example_one_page.dart`, shows how to focus to next TextField or TextFormField in Flutter
+   and unfocus on the last field using `focus`, `unfocus`, `requestFocus` properties.
+   <br/> Initialize two `FocusNode`s:
+
+```dart
+
+final field1FocusNode = FocusNode();
+final field2FocusNode = FocusNode();
+```
+
+Also dispose them in the end:
+
+```dart
+  @override
+void dispose() {
+  field1FocusNode.dispose();
+  field2FocusNode.dispose();
+  super.dispose();
+}
+```
+
+`body` of this page has a `Column` and column has two children as `TextFormField`.
+<br/> **First `TextFormField` is**:
+
+```dart 
+                TextFormField(
+                  focusNode: field1FocusNode,
+                  // autofocus enable focus on the field as page gets visible
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    hintText: 'Field 1',
+                    border: OutlineInputBorder(),
+                  ),
+                  onFieldSubmitted: (_) {
+                    // pass focus to the next TextFormField when submit button is tapped on keyboard
+                    FocusScope.of(context).requestFocus(field2FocusNode);
+                    // field2FocusNode.requestFocus(); // This works same as above
+                  },
+                  textInputAction: TextInputAction.next,
+                ),
+```
+
+- Assign `field1FocusNode` to the `focusNode` property.
+- If `autofocus` property of `TextField` or `TextFormField` is set to `true` then when we open the
+  page, the focus is automatically given to the that specific field.
+- For `onFieldSubmitted`, set the focus to the next `TextFormField` whose `focusNode` name
+  is `field2FocusNode` using `FocusScope.of(context).requestFocus(field2FocusNode);` or
+  `field2FocusNode.requestFocus();`
+- `textInputAction` is set to next which means next button or icon will be shown on the keyboard
+  when keyboard is opened for this field.
+  <br/> **Second `TextFormField` is**:
+
+```dart 
+                TextFormField(
+                  focusNode: field2FocusNode,
+                  decoration: const InputDecoration(
+                    hintText: 'Field 2',
+                    border: OutlineInputBorder(),
+                  ),
+                  onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
+                  textInputAction: TextInputAction.done,
+                ),
+```
+
+- Assign `field2FocusNode` to the `focusNode` property.
+- For `onFieldSubmitted`, `unfocus` from current field. It hides the keyboard and removes the cursor
+  from this field.
+
+3. `focus_example_two_page.dart` shows how to hide/show keyboard | TextField Focus/Unfocus.
+   <br/> Initialize the focusNode, and also dispose it when we navigate to any other page.
+
+```dart
+
+final fieldFocusNode = FocusNode();
+
+@override
+void dispose() {
+  fieldFocusNode.dispose();
+  super.dispose();
+}
+```
+
+- It's body has a `Column` and column has one `TextFormField` and two `ElevatedButton`s to show or
+  hide the keyboard using `focus` and `unfocus`.
+
+```dart 
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              TextField(
+                focusNode: fieldFocusNode,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'TextField',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () => FocusManager.instance.primaryFocus?.unfocus(),
+                child: const Text('Hide'),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () => FocusManager.instance.primaryFocus
+                    ?.requestFocus(fieldFocusNode),
+                child: const Text('Show'),
+              ),
+            ],
+          ),
+        ),
+```
+
+- For `TextField`, `focusNode` is set to `fieldFocusNode` and `autofocus` is set to true.
+- When first button is pressed, `FocusManager.instance.primaryFocus?.unfocus(),` is used
+  to `unfocus` from the `TextField`.
+- When second button is pressed, `FocusManager.instance.primaryFocus?.requestFocus(fieldFocusNode),`
+  is used to `focus` on the `TextField`.
+
 4. `focus_example_three_page.dart` shows how to dismiss the keyboard in `SingleChildScrollView` when
    user scroll under textfield.
+
+```dart 
+
+        body: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Center(
+              child: Column(
+                children: const [
+                  SizedBox(height: 20),
+                  TextField(
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: 'TextField',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin a lacus a ipsum vehicula egestas. Ut laoreet enim eget justo dictum efficitur. Ut tempus lectus urna, quis porta eros feugiat vitae. Maecenas sed interdum lacus. Donec ut nisi nisl. In at viverra ex, id feugiat velit. Proin eget ex porttitor, accumsan massa ut, lacinia elit. Suspendisse vitae lorem elit. Maecenas condimentum nunc non scelerisque ornare. Curabitur eget tempus lacus. Etiam vel volutpat enim. Sed non metus sed odio aliquet congue ac eget orci. Praesent ornare aliquam posuere. Proin placerat diam varius mauris aliquam tincidunt.'
+                      'Cras at ultrices lectus, eget vehicula magna. Aenean sed metus vitae magna ornare condimentum. Cras euismod justo a quam pharetra pharetra. Vivamus feugiat velit enim, ut posuere metus pretium eu. Pellentesque quis vestibulum nunc. Nulla aliquam sem ut est iaculis scelerisque. Ut lobortis sit amet orci at dignissim. Ut blandit elementum magna. Suspendisse porta, metus vitae aliquam faucibus, nisl felis convallis nisl, id semper diam orci eu nunc. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.'
+                      'Mauris dignissim velit vel ullamcorper pretium. Sed tempus massa sit amet justo tempus mattis in in risus. Morbi ex ipsum, laoreet eu libero at, pretium placerat libero. Fusce rutrum gravida eros vel varius. Nunc vitae velit in nibh tincidunt sagittis in id lectus. Maecenas tincidunt interdum iaculis. Ut neque lacus, laoreet quis pellentesque porta, eleifend non nisl. Pellentesque vel laoreet erat, sit amet iaculis lectus. Integer faucibus ex ornare mauris pellentesque ornare. Nulla auctor elit mi. Cras egestas auctor sodales. Mauris rhoncus nisi et aliquam tincidunt. Pellentesque at urna dui. Duis consectetur est quis rhoncus commodo.'),
+                ],
+              ),
+            ),
+          ),
+        ),
+```
+
+- `autofocus` for `TextField` is set to true.
+- Under the `TextField` there is a lot of text to read for which we have to scroll down.
+- When `TextField` has focus and we scroll down on screen then
+  use `keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,` to `unfocus` from
+  the `TextField`.
+
 5. **Note:**
    <br/>For flutter 2.0 or latest and for flutter < 2: see this
    article [https://stackoverflow.com/questions/44991968/how-can-i-dismiss-the-on-screen-keyboard](https://stackoverflow.com/questions/44991968/how-can-i-dismiss-the-on-screen-keyboard)
